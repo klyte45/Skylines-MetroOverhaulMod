@@ -17,7 +17,7 @@ namespace MetroOverhaul
         public static Initializer Container;
         private static AssetsUpdater _updater;
         public static bool Done { get; private set; } // Only one Assets installation throughout the application
-
+        protected static PropInfo _stuff;
         private static readonly Queue<Action> LateBuildUpQueue = new Queue<Action>();
 #if DEBUG
         private bool indebug = true;
@@ -134,7 +134,7 @@ namespace MetroOverhaul
                 if (OptionsWrapper<Options>.Options.metroUi)
                 {
                     UIView.GetAView().AddUIComponent(typeof(MetroStationCustomizerUI));
-                    UIView.GetAView().AddUIComponent(typeof(MetroTrackCustomizerUI));
+                   // UIView.GetAView().AddUIComponent(typeof(MetroTrackCustomizerUI));
 					UIView.GetAView().AddUIComponent(typeof(MetroAboveGroundStationCustomizerUI));
                 }
 
@@ -148,7 +148,7 @@ namespace MetroOverhaul
                 //gameObject.AddComponent<StyleSelectionStationUI>();
 #if DEBUG
                 UIView.GetAView().AddUIComponent(typeof(MetroStationCustomizerUI));
-                UIView.GetAView().AddUIComponent(typeof(MetroTrackCustomizerUI));
+               // UIView.GetAView().AddUIComponent(typeof(MetroTrackCustomizerUI));
 				UIView.GetAView().AddUIComponent(typeof(MetroAboveGroundStationCustomizerUI));
 #endif
 			}

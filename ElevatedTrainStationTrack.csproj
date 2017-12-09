@@ -70,6 +70,33 @@
     <Compile Include="Redirection\Attributes\RedirectReverseAttribute.cs" />
     <Compile Include="Redirection\Attributes\TargetTypeAttribute.cs" />
     <Compile Include="Redirection\Extensions\TypeExtension.cs" />
+    <Compile Include="Stuff\Buildings\BuildingNetworkSkinsDef.cs" />
+    <Compile Include="Stuff\Buildings\BuildingToolWatcher.cs" />
+    <Compile Include="Stuff\Data\SegmentData.cs" />
+    <Compile Include="Stuff\Data\SegmentDataManager.cs" />
+    <Compile Include="Stuff\Detour\RedirectionHelper.cs" />
+    <Compile Include="Stuff\Detour\RenderManagerDetour.cs" />
+    <Compile Include="Stuff\LightPropEnabler\LightPropEnabler.cs" />
+    <Compile Include="Stuff\Meshes\UIBridgeTypeOption.cs" />
+    <Compile Include="Stuff\Net\INetToolWrapper.cs" />
+    <Compile Include="Stuff\Net\LanePosition.cs" />
+    <Compile Include="Stuff\Net\NetManagerDetour.cs" />
+    <Compile Include="Stuff\Net\NetToolWrapperFineRoadHeights.cs" />
+    <Compile Include="Stuff\Net\NetToolWrapperVanilla.cs" />
+    <Compile Include="Stuff\Net\NetType.cs" />
+    <Compile Include="Stuff\Net\NetUtil.cs" />
+    <Compile Include="Stuff\Pillars\PillarCustomizer.cs" />
+    <Compile Include="Stuff\Pillars\PillarType.cs" />
+    <Compile Include="Stuff\Pillars\UIPillarOption.cs" />
+    <Compile Include="Stuff\Props\NetLaneDetour.cs" />
+    <Compile Include="Stuff\Props\PropCustomizer.cs" />
+    <Compile Include="Stuff\Textures\NetSegmentDetour.cs" />
+    <Compile Include="Stuff\UI\UIDropDownOption.cs" />
+    <Compile Include="Stuff\UI\UIDropDownTextFieldOption.cs" />
+    <Compile Include="Stuff\UI\UINetworkSkinsPanel.cs" />
+    <Compile Include="Stuff\UI\UIOption.cs" />
+    <Compile Include="Stuff\UI\UISliderOption.cs" />
+    <Compile Include="Stuff\UI\UIUtil.cs" />
     <Compile Include="TrainTrackAIMetro.cs" />
     <Compile Include="TrainTrackBridgeAIMetro.cs" />
     <Compile Include="MetroTrackAIMetro.cs" />
@@ -141,6 +168,9 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CimTools">
+      <HintPath>..\NetworkSkins2\NetworkSkins\bin\Debug\CimTools.dll</HintPath>
     </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
@@ -2197,6 +2227,7 @@
     <Content Include="Resources\Textures\Tunnel_Station_Segment_Pavement__XYSMap_LOD.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Stuff\sprites\sprites.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\Meshes\14m\Station\" />

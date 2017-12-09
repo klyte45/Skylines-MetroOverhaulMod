@@ -3,6 +3,7 @@ using MetroOverhaul.NEXT;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using NetworkSkins.Props;
 
 namespace MetroOverhaul.InitializationSteps
 {
@@ -46,21 +47,25 @@ namespace MetroOverhaul.InitializationSteps
                         var propsList = new List<NetLaneProps.Prop>();
                         if (pillarPropList != null && pillarPropList.Count > 0)
                         {
+
                             for (var i = 0; i < pillarPropList.Count; i++)
                             {
-                                var thePillarPropInfo = pillarPropList[i];
-                                if (thePillarPropInfo != null)
+                                var aPillarPropInfo = pillarPropList[i];
+                                if (aPillarPropInfo != null)
                                 {
                                     var prop = new NetLaneProps.Prop();
-                                    prop.m_prop = thePillarPropInfo.Prop;
-                                    prop.m_position = thePillarPropInfo.Position;
-                                    prop.m_finalProp = thePillarPropInfo.Prop;
-                                    prop.m_probability = 0;
-                                    prop.m_repeatDistance = thePillarPropInfo.RepeatDistance;
-                                    prop.m_segmentOffset = thePillarPropInfo.SegmentOffset;
+                                    prop.m_prop = aPillarPropInfo.Prop;
+                                    prop.m_position = aPillarPropInfo.Position;
+                                    prop.m_finalProp = aPillarPropInfo.Prop;
+                                    prop.m_probability = 100;
+                                    prop.m_repeatDistance = aPillarPropInfo.RepeatDistance;
+                                    prop.m_segmentOffset = aPillarPropInfo.SegmentOffset;
                                     propsList.Add(prop);
                                 }
                             }
+
+                            PropCustomizer.Instance.SetPillarProp(prefab, pillarPropList[0].Prop);
+                            PropCustomizer.Instance.SetPillarPropDistance(prefab, 10);
                         }
 
                         propLane.m_laneProps.m_props = propsList.ToArray();

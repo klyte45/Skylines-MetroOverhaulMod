@@ -6,6 +6,7 @@ using UnityEngine;
 using MetroOverhaul.NEXT.Extensions;
 using System.Linq;
 using System.Collections.Generic;
+using NetworkSkins.Props;
 
 namespace MetroOverhaul.UI
 {
@@ -512,56 +513,16 @@ namespace MetroOverhaul.UI
             }
             if (prefab != null)
             {
-                m_netTool.m_prefab = prefab;
-                var elevation = m_netTool.GetElevation();
-                var lanes = m_netTool.m_prefab.m_lanes.ToList();
-                Next.Debug.Log($"MOM EE lane count: {lanes.Count()}");
-                var lane = lanes.FirstOrDefault(l => l.m_laneType == NetInfo.LaneType.None);
-                NetLaneProps.Prop prop = null;
-                if (lane != null)
+                if (extraElevated)
                 {
-                    var propList = lane.m_laneProps.m_props?.ToList();
-                    if (propList != null)
-                    {
-                        Next.Debug.Log($"MOM EE lane found with {propList.Count()} props");
-                        prop = propList.FirstOrDefault(p => p.m_prop.name.ToLower().Contains("l pillar ("));
-                        if (prop != null)
-                        {
-                            Next.Debug.Log($"MOM EE Examining aLane");
-                            var name = prop.m_prop.name;
-                            if (extraElevated)
-                            {
-                                prop.m_probability = 100;
-                                Next.Debug.Log("MOM EE Enabled");
-                            }
-                            else
-                            {
-                                prop.m_probability = 0;
-                                Next.Debug.Log("MOM EE Disabled");
-                            }
-                            var props = lane.m_laneProps.m_props?.ToList();
-                            if (props != null)
-                            {
-                                var replacementPair = new KeyValuePair<string, PropInfo>(name, prop.m_prop);
-
-                                if (props.Any(p => p.m_prop.name.ToLower().Contains(replacementPair.Key.ToLower())))
-                                {
-                                    var tempProp = new NetLaneProps.Prop();
-                                    var propsToReplace = props.Where(p => p.m_prop.name.ToLower().Contains(replacementPair.Key.ToLower())).ToList();
-                                    for (var i = 0; i < propsToReplace.Count; i++)
-                                    {
-                                        tempProp = propsToReplace[i].ShallowClone();
-                                        props.Remove(propsToReplace[i]);
-                                        tempProp.m_prop = replacementPair.Value;
-                                        props.Add(tempProp);
-                                    }
-                                }
-                                lane.m_laneProps.m_props = props.ToArray();
-                            }
+                    
+                    PropCustomizer.Instance.SetPillarPropDistance(prefab, 60);
                         }
-                    }
+                else
+                {
+                    PropCustomizer.Instance.SetPillarPropDistance(prefab, 1000);
                 }
-                m_netTool.m_prefab.m_lanes = lanes.ToArray();
+                m_netTool.Prefab = prefab;
             }
         }
 

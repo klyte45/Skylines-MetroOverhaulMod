@@ -51,7 +51,6 @@ namespace MetroOverhaul
                                 heightOffset = thePillarInfo.HeightOffset - 1f - thePillarInfo.info.m_generatedInfo.m_size.y;
                             }
                         }
-
                     }
                     return;
                 }
