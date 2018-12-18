@@ -79,36 +79,32 @@ namespace MetroOverhaul
                 //    }
                 //}
             }
-            if (!IsMetroPed())
+            ReconfigureStationAccess(connectPoints);
+            BendStationTrack();
+            RecalculateSpawnPoints();
+
+            if (superInfo != null)
             {
-                ReconfigureStationAccess(connectPoints);
-                BendStationTrack();
-                RecalculateSpawnPoints();
+                var specialNetInfo = FindNetInfo("Pedestrian Connection Inside").ShallowClone();
+                specialNetInfo.m_maxSlope = 100;
+                specialNetInfo.m_maxTurnAngle = 180;
+                specialNetInfo.m_maxTurnAngleCos = -1;
+                var lanes = specialNetInfo.m_lanes.ToList();
+                lanes.First().m_speedLimit = 10;
+                specialNetInfo.m_lanes = lanes.ToArray();
 
-                if (superInfo != null)
+                for (var i = 0; i < superInfo.m_paths.Count(); i++)
                 {
-                    var specialNetInfo = FindNetInfo("Pedestrian Connection Inside").ShallowClone();
-                    specialNetInfo.m_maxSlope = 100;
-                    specialNetInfo.m_maxTurnAngle = 180;
-                    specialNetInfo.m_maxTurnAngleCos = -1;
-                    var lanes = specialNetInfo.m_lanes.ToList();
-                    lanes.First().m_speedLimit = 10;
-                    specialNetInfo.m_lanes = lanes.ToArray();
-
-                    for (var i = 0; i < superInfo.m_paths.Count(); i++)
+                    superInfo.m_paths[i].m_forbidLaneConnection = null;
+                    if (IsPedestrianPath(superInfo.m_paths[i]))
                     {
-                        superInfo.m_paths[i].m_forbidLaneConnection = null;
-                        if (IsPedestrianPath(superInfo.m_paths[i]))
-                        {
-                            superInfo.m_paths[i].AssignNetInfo(specialNetInfo);
-                        }
-                    }
-                    for (var i = 0; i < m_Info.m_paths.Count(); i++)
-                    {
-                        m_Info.m_paths[i].m_forbidLaneConnection = null;
+                        superInfo.m_paths[i].AssignNetInfo(specialNetInfo);
                     }
                 }
-
+                for (var i = 0; i < m_Info.m_paths.Count(); i++)
+                {
+                    m_Info.m_paths[i].m_forbidLaneConnection = null;
+                }
             }
         }
         private static bool IsMetroPed()
@@ -196,9 +192,31 @@ namespace MetroOverhaul
             {
                 aPath = new BuildingInfo.PathInfo();
             }
-
+            if (IsMetroPed())
+            {
+                for (int i = 0; i < pathList.Count; i++)
+                {
+                    if (IsPedestrianPath(pathList[i]))
+                    {
+                        MarkPathGenerated(pathList[i]);
+                    }
+                }
+            }
             for (int i = 0; i < pathList.Count; i++)
             {
+                if (IsPedestrianTunnel(pathList[i]))
+                {
+                    pathList[i].m_maxSnapDistance = 0.1f;
+                    var forbiddenList = new List<bool>();
+                    //var singleVectors = pathList.SelectMany(p => p.m_nodes).GroupBy(n => n).Where(g => g.Count() == 1).Select(g2=>g2.Key).Distinct().ToList();
+                    var pedConnections = pathList.Where(p => p.m_finalNetInfo?.name != null && IsPedestrianPath(p)).SelectMany(p2 => p2.m_nodes).ToList();
+                    for (int j = 0; j < pathList[i].m_nodes.Length; j++)
+                    {
+                        
+                        forbiddenList.Add(pedConnections.Contains(pathList[i].m_nodes[j]));
+                    }
+                    pathList[i].m_forbidLaneConnection = null;
+                }
                 if (pathList[i].m_netInfo != null && pathList[i].m_netInfo.IsUndergroundMetroStationTrack())
                 {
                     var trackPath = pathList[i];
@@ -226,7 +244,7 @@ namespace MetroOverhaul
                     var stationLength = Vector3.Distance(trackPath.m_nodes[0], trackPath.m_nodes.Last());
                     var stairsLengthX = (((0.12f * m_BendStrength) + 1) * (stationLength * StairCoeff)) * -xCoeff;
                     var stairsLengthZ = (((0.12f * m_BendStrength) + 1) * (stationLength * StairCoeff)) * zCoeff;
-                    var interpolant = 0.6f;
+                    var interpolant = IsMetroPed() ? 0.5f : 0.6f;
                     var crossing = Vector3.Lerp(trackPath.m_nodes.First(), trackPath.m_nodes.Last(), interpolant);
 
                     if (trackPath.m_netInfo.IsUndergroundIslandPlatformStationTrack())
@@ -306,11 +324,11 @@ namespace MetroOverhaul
                                 y = trackPath.m_nodes[0].y,
                                 z = firstNode.z + (14 * xCoeff)
                             });
-                            //for (int j = 0; j < nodeConnectorList.Count(); j++)
-                            //{
-                            //    var closestPedestrianTunnel = m_Info.m_paths.Where(p => IsPedestrianTunnel(p)).SelectMany(p => p.m_nodes).OrderBy(n => Vector3.Distance(nodeConnectorList[j], n)).FirstOrDefault();
-                            //    pathList.Add(CreatePath(closestPedestrianTunnel, nodeConnectorList[j], specialNetInfo));
-                            //}
+                            for (int j = 0; j < nodeConnectorList.Count(); j++)
+                            {
+                                var closestPedestrianTunnel = m_Info.m_paths.Where(p => IsPedestrianTunnel(p)).SelectMany(p => p.m_nodes).OrderBy(n => Vector3.Distance(nodeConnectorList[j], n)).FirstOrDefault();
+                                pathList.Add(CreatePath(closestPedestrianTunnel, nodeConnectorList[j], specialNetInfo));
+                            }
                         }
                         else
                         {
