@@ -9,6 +9,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 using static ColossalFramework.Plugins.PluginManager;
 using ColossalFramework.PlatformServices;
+using MetroOverhaul.NEXT;
 
 namespace MetroOverhaul
 {
@@ -114,6 +115,18 @@ namespace MetroOverhaul
         public static bool IsGameMode()
         {
             return ToolManager.instance.m_properties.m_mode == ItemClass.Availability.Game;
+        }
+
+        public static string SwitchVersion(string name, NetInfoVersion versionTo)
+        {
+            foreach (NetInfoVersion version in Enum.GetValues(typeof(NetInfoVersion)))
+            {
+                if (name.Contains(version.ToString()))
+                {
+                    return name.Replace(version.ToString(), versionTo.ToString());
+                }
+            }
+            return name + " " + versionTo.ToString();
         }
     }
 }

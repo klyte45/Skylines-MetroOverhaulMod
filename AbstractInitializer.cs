@@ -11,6 +11,7 @@ namespace MetroOverhaul
     {
         private bool _isInitialized;
         private Dictionary<string, NetInfo> _customNetInfos;
+        private Dictionary<string, NetInfo> _customNetInfoClones;
         private Dictionary<string, BuildingInfo> _customBuildingInfos;
         private static readonly Dictionary<string, NetInfo> OriginalNetInfos = new Dictionary<string, NetInfo>();
         private static readonly Dictionary<string, BuildingInfo> OriginalBuildingInfos = new Dictionary<string, BuildingInfo>();
@@ -20,6 +21,7 @@ namespace MetroOverhaul
         {
             DontDestroyOnLoad(this);
             _customNetInfos = new Dictionary<string, NetInfo>();
+            _customNetInfoClones = new Dictionary<string, NetInfo>();
             _customBuildingInfos = new Dictionary<string, BuildingInfo>();
             _netReplacements = new List<string>();
             OriginalNetInfos.Clear();
@@ -32,6 +34,7 @@ namespace MetroOverhaul
             {
                 _netReplacements.Clear();
                 _customNetInfos.Clear();
+                _customNetInfoClones.Clear();
                 OriginalNetInfos.Clear();
                 _customBuildingInfos.Clear();
                 OriginalBuildingInfos.Clear();
@@ -66,6 +69,7 @@ namespace MetroOverhaul
 
                 InitializeImpl();
                 PrefabCollection<NetInfo>.InitializePrefabs("Rail Extensions", _customNetInfos.Values.ToArray(), !OptionsWrapper<Options>.Options.ghostMode ? _netReplacements.ToArray() : null);
+                PrefabCollection<NetInfo>.InitializePrefabs("Rail Extension Clones", _customNetInfoClones.Values.ToArray(), null);
                 PrefabCollection<BuildingInfo>.InitializePrefabs("Rail Building Extensions", _customBuildingInfos.Values.ToArray(), null);
                 //if (OptionsWrapper<Options>.Options.ghostMode)
                 //{
@@ -103,6 +107,31 @@ namespace MetroOverhaul
             setupAction.Invoke(newPrefab);
             _customNetInfos.Add(newNetInfoName, newPrefab);
             _netReplacements.Add(replaces);
+            return newPrefab;
+        }
+        protected NetInfo CreateClonedNetInfo(string newNetInfoName, string originalNetInfoName, Action<NetInfo> setupAction)
+        {
+            var originalPrefab = FindOriginalNetInfo(originalNetInfoName);
+
+            if (originalPrefab == null)
+            {
+                Debug.LogErrorFormat("AbstractInitializer#CreatePrefab - Prefab '{0}' not found (required for '{1}')", originalNetInfoName, newNetInfoName);
+                return null;
+            }
+            if (_customNetInfoClones.ContainsKey(newNetInfoName))
+            {
+                Debug.LogErrorFormat("AbstractInitializer#CreatePrefab - Prefab '{0}' was already created", newNetInfoName);
+                return null;
+            }
+            var newPrefab = Util.ClonePrefab(originalPrefab, newNetInfoName, transform);
+            if (newPrefab == null)
+            {
+                Debug.LogErrorFormat("AbstractInitializer#CreatePrefab - Couldn't make prefab '{0}'", newNetInfoName);
+                return null;
+            }
+            if (setupAction != null)
+                setupAction.Invoke(newPrefab);
+            _customNetInfoClones.Add(newNetInfoName, newPrefab);
             return newPrefab;
         }
         protected void CreateBuildingInfo(string newBuildingInfoName, string originalBuildingInfoName, Action<BuildingInfo> setupAction = null)
