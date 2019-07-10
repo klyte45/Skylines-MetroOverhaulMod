@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AbstractInitializer.cs" />
+    <Compile Include="AI\SingleMetroTrackAI\Util.cs" />
     <Compile Include="AssetsUpdater.cs" />
     <Compile Include="Detours\PassengerTrainAIDetour.cs" />
     <Compile Include="Detours\RoadsGroupPanelDetour.cs" />
@@ -80,17 +81,20 @@
     <Compile Include="Redirection\Attributes\RedirectReverseAttribute.cs" />
     <Compile Include="Redirection\Attributes\TargetTypeAttribute.cs" />
     <Compile Include="Redirection\Extensions\TypeExtension.cs" />
+    <Compile Include="AI\SingleMetroTrackAI\ReservationData.cs" />
+    <Compile Include="AI\SingleMetroTrackAI\ReservationManager.cs" />
     <Compile Include="SetUpdateStationCustomizations.cs" />
     <Compile Include="ModTrackNames.cs" />
-    <Compile Include="TrainTrackAIMetro.cs" />
-    <Compile Include="TrainTrackBridgeAIMetro.cs" />
+    <Compile Include="AI\SingleMetroTrackAI\SingleMetroTrackAI.cs" />
+    <Compile Include="AI\TrainTrackAIMetro.cs" />
+    <Compile Include="AI\TrainTrackBridgeAIMetro.cs" />
     <Compile Include="MetroTrackAIMetro.cs" />
     <Compile Include="UI\StationTypeSelectorTooltip.cs" />
     <Compile Include="UI\MetroAboveGroundStationCustomizerUI.cs" />
     <Compile Include="UI\MetroCustomizerBaseUI.cs" />
     <Compile Include="UI\MetroTrackAssetCustomizerUI.cs" />
     <Compile Include="UI\MetroTrackCustomizerUI.cs" />
-    <Compile Include="TrainTrackTunnelAIMetro.cs" />
+    <Compile Include="AI\TrainTrackTunnelAIMetro.cs" />
     <Compile Include="InitializationSteps\LateBuildUpSteel.cs" />
     <Compile Include="InitializationSteps\LateBuildUp.cs" />
     <Compile Include="InitializationSteps\CommonSteps.cs" />
