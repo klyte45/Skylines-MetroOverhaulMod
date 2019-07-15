@@ -5,14 +5,15 @@ namespace MetroOverhaul.OptionsFramework.Attibutes
 {
     public abstract class AbstractOptionsAttribute : Attribute
     {
-        protected AbstractOptionsAttribute(string description, string group, Type actionClass, string actionMethod)
+        protected AbstractOptionsAttribute(string title, string description, string group, Type actionClass, string actionMethod)
         {
+            Title = title;
             Description = description;
             Group = group;
             ActionClass = actionClass;
             ActionMethod = actionMethod;
         }
-
+        public string Title { get; }
         public string Description { get; }
         public string Group { get; }
 

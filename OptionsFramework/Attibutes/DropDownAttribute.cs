@@ -8,7 +8,7 @@ namespace MetroOverhaul.OptionsFramework.Attibutes
     [AttributeUsage(AttributeTargets.Property)]
     public class DropDownAttribute : AbstractOptionsAttribute
     {
-        public DropDownAttribute(string description, Type itemsClass, string group = null, Type actionClass = null, string actionMethod = null) : base(description, group, actionClass, actionMethod)
+        public DropDownAttribute(string title, string description, Type itemsClass, string group = null, Type actionClass = null, string actionMethod = null) : base(title, description, group, actionClass, actionMethod)
         {
             ItemsClass = itemsClass;
         }

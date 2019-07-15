@@ -19,11 +19,12 @@ namespace MetroOverhaul.OptionsFramework.Extensions
             var groups = new Dictionary<string, UIHelperBase>();
             foreach (var propertyName in properties)
             {
+                var title = OptionsWrapper<T>.Options.GetPropertyTitle(propertyName);
                 var description = OptionsWrapper<T>.Options.GetPropertyDescription(propertyName);
                 var groupName = OptionsWrapper<T>.Options.GetPropertyGroup(propertyName);
                 if (groupName == null)
                 {
-                    var component = helper.ProcessProperty<T>(propertyName, description);
+                    var component = helper.ProcessProperty<T>(propertyName, title, description);
                     if (component != null)
                     {
                         result.Add(component);
@@ -35,7 +36,7 @@ namespace MetroOverhaul.OptionsFramework.Extensions
                     {
                         groups[groupName] = helper.AddGroup(groupName);
                     }
-                    var component = groups[groupName].ProcessProperty<T>(propertyName, description);
+                    var component = groups[groupName].ProcessProperty<T>(propertyName, title, description);
                     if (component != null)
                     {
                         result.Add(component);
@@ -45,33 +46,33 @@ namespace MetroOverhaul.OptionsFramework.Extensions
             return result;
         }
 
-        private static UIComponent ProcessProperty<T>(this UIHelperBase group, string name, string description)
+        private static UIComponent ProcessProperty<T>(this UIHelperBase group, string name, string title, string description)
         {
             var checkboxAttribute = OptionsWrapper<T>.Options.GetAttribute<T, CheckboxAttribute>(name);
             if (checkboxAttribute != null)
             {
-                return group.AddCheckbox<T>(description, name, checkboxAttribute);
+                return group.AddCheckbox<T>(title, description, name, checkboxAttribute);
             }
             var textfieldAttribute = OptionsWrapper<T>.Options.GetAttribute<T, TextfieldAttribute>(name);
             if (textfieldAttribute != null)
             {
-                return group.AddTextfield<T>(description, name, textfieldAttribute);
+                return group.AddTextfield<T>(title, description, name, textfieldAttribute);
             }
             var dropDownAttribute = OptionsWrapper<T>.Options.GetAttribute<T, DropDownAttribute>(name);
             if (dropDownAttribute != null)
             {
-                return group.AddDropdown<T>(description, name, dropDownAttribute);
+                return group.AddDropdown<T>(title, description, name, dropDownAttribute);
             }
             var sliderAttribute = OptionsWrapper<T>.Options.GetAttribute<T, SliderAttribute>(name);
             if (sliderAttribute != null)
             {
-                return group.AddSlider<T>(description, name, sliderAttribute);
+                return group.AddSlider<T>(title, description, name, sliderAttribute);
             }
             //TODO: more control types
             return null;
         }
 
-        private static UIDropDown AddDropdown<T>(this UIHelperBase group, string text, string propertyName, DropDownAttribute attr)
+        private static UIDropDown AddDropdown<T>(this UIHelperBase group, string text, string tooltip, string propertyName, DropDownAttribute attr)
         {
             var property = typeof(T).GetProperty(propertyName);
             var defaultCode = (int)property.GetValue(OptionsWrapper<T>.Options, null);
@@ -85,32 +86,36 @@ namespace MetroOverhaul.OptionsFramework.Extensions
                 defaultSelection = 0;
                 property.SetValue(OptionsWrapper<T>.Options, attr.Items.First().Value, null);
             }
-            return (UIDropDown)group.AddDropdown(text, attr.Items.Select(kvp => kvp.Key).ToArray(), defaultSelection, sel =>
-           {
-               var code = attr.Items[sel].Value;
-               property.SetValue(OptionsWrapper<T>.Options, code, null);
-               OptionsWrapper<T>.SaveOptions();
-               attr.Action<int>().Invoke(code);
-           });
+            var dropdown = (UIDropDown)group.AddDropdown(text, attr.Items.Select(kvp => kvp.Key).ToArray(), defaultSelection, sel =>
+            {
+                var code = attr.Items[sel].Value;
+                property.SetValue(OptionsWrapper<T>.Options, code, null);
+                OptionsWrapper<T>.SaveOptions();
+                attr.Action<int>().Invoke(code);
+            });
+            dropdown.tooltip = tooltip;
+            return dropdown; 
         }
 
-        private static UICheckBox AddCheckbox<T>(this UIHelperBase group, string text, string propertyName, CheckboxAttribute attr)
+        private static UICheckBox AddCheckbox<T>(this UIHelperBase group, string text, string tooltip, string propertyName, CheckboxAttribute attr)
         {
             var property = typeof(T).GetProperty(propertyName);
-            return (UICheckBox)group.AddCheckbox(text, (bool)property.GetValue(OptionsWrapper<T>.Options, null),
+            var checkbox = (UICheckBox)group.AddCheckbox(text, (bool)property.GetValue(OptionsWrapper<T>.Options, null),
                 b =>
                 {
                     property.SetValue(OptionsWrapper<T>.Options, b, null);
                     OptionsWrapper<T>.SaveOptions();
                     attr.Action<bool>().Invoke(b);
                 });
+            checkbox.tooltip = tooltip;
+            return checkbox;
         }
 
-        private static UITextField AddTextfield<T>(this UIHelperBase group, string text, string propertyName, TextfieldAttribute attr)
+        private static UITextField AddTextfield<T>(this UIHelperBase group, string text, string tooltip, string propertyName, TextfieldAttribute attr)
         {
             var property = typeof(T).GetProperty(propertyName);
             var initialValue = Convert.ToString(property.GetValue(OptionsWrapper<T>.Options, null));
-            return (UITextField)group.AddTextfield(text, initialValue, s => { },
+            var textField = (UITextField)group.AddTextfield(text, initialValue, s => { },
                 s =>
                 {
                     object value;
@@ -138,9 +143,11 @@ namespace MetroOverhaul.OptionsFramework.Extensions
                     OptionsWrapper<T>.SaveOptions();
                     attr.Action<string>().Invoke(s);
                 });
+            textField.tooltip = tooltip;
+            return textField;
         }
 
-        private static UISlider AddSlider<T>(this UIHelperBase group, string text, string propertyName, SliderAttribute attr)
+        private static UISlider AddSlider<T>(this UIHelperBase group, string text, string tooltip, string propertyName, SliderAttribute attr)
         {
             var property = typeof(T).GetProperty(propertyName);
             UILabel valueLabel = null;
@@ -168,6 +175,7 @@ namespace MetroOverhaul.OptionsFramework.Extensions
                         valueLabel.text = f.ToString(CultureInfo.InvariantCulture);
                     }
                 });
+            slider.tooltip = tooltip;
             var nameLabel = slider.parent.Find<UILabel>("Label");
             if (nameLabel != null)
             {

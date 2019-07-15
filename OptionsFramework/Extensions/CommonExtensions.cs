@@ -4,6 +4,13 @@ namespace MetroOverhaul.OptionsFramework.Extensions
 {
     public static class CommonExtensions
     {
+        public static string GetPropertyTitle<T>(this T value, string propertyName)
+        {
+            var fi = value.GetType().GetProperty(propertyName);
+            var attributes =
+                (AbstractOptionsAttribute[])fi.GetCustomAttributes(typeof(AbstractOptionsAttribute), false);
+            return attributes.Length > 0 ? attributes[0].Title : null;
+        }
         public static string GetPropertyDescription<T>(this T value, string propertyName)
         {
             var fi = value.GetType().GetProperty(propertyName);
